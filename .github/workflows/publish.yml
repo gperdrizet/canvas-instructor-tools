@@ -3,8 +3,7 @@ name: Publish to PyPI
 on:
   release:
     types: [published]
-  push:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   pypi-publish:
@@ -38,6 +37,7 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
 
   testpypi-publish:
+    if: github.event_name == 'workflow_dispatch'
     name: Upload release to TestPyPI
     runs-on: ubuntu-latest
     environment:
