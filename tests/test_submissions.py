@@ -20,7 +20,13 @@ class TestSubmissions(unittest.TestCase):
         
         # Mock submission data
         mock_submission.user = {'name': 'Test User'}
-        mock_submission.attachments = [{'url': 'http://file.url', 'display_name': 'test.pdf'}]
+        
+        # Create a mock for the attachment object
+        mock_attachment = MagicMock()
+        mock_attachment.url = 'http://file.url'
+        mock_attachment.display_name = 'test.pdf'
+        mock_submission.attachments = [mock_attachment]
+        
         mock_assignment.get_submissions.return_value = [mock_submission]
         
         # Mock requests response

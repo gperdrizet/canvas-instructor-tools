@@ -3,7 +3,7 @@ import requests
 from pathlib import Path
 from .client import get_client
 
-def download_assignment_submissions(course_id, assignment_id, output_dir="submissions"):
+def download_assignment_submissions(course_id, assignment_id, output_dir="data"):
     """
     Download all submissions for a specific assignment.
     
@@ -33,8 +33,8 @@ def download_assignment_submissions(course_id, assignment_id, output_dir="submis
         user_name = submission.user["name"].replace(" ", "_").replace("/", "-")
         
         for attachment in submission.attachments:
-            file_url = attachment["url"]
-            original_filename = attachment["display_name"]
+            file_url = attachment.url
+            original_filename = attachment.display_name
             
             # Construct new filename: Student_Name_OriginalFilename
             new_filename = f"{user_name}_{original_filename}"
