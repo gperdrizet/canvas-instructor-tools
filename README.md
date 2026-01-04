@@ -51,4 +51,34 @@ download_assignment_submissions(
 
 1.  Clone the repository.
 2.  Install dependencies: `pip install -e .`
-3.  Run tests: `pytest`
+3.  Run tests: `python -m unittest discover tests`
+
+## CI/CD & Publishing
+
+This project uses GitHub Actions for automated testing and publishing.
+
+### Workflow Overview
+
+*   **CI (`.github/workflows/ci.yml`)**: Runs on every Pull Request and push to `main`.
+    *   Tests across Python 3.11, 3.12, and 3.13.
+    *   Verifies the package builds successfully.
+*   **Publish (`.github/workflows/publish.yml`)**: Runs when a GitHub Release is published.
+    *   Builds the package.
+    *   Publishes to **TestPyPI** and **PyPI** using Trusted Publishing (OIDC).
+
+### How to Publish a New Version
+
+1.  **Update Version**:
+    *   Edit `pyproject.toml` and increment the `version` (e.g., `0.0.1` -> `0.0.2`).
+    *   Commit and push to `main`.
+
+2.  **Create Release**:
+    *   Go to the GitHub repository page.
+    *   Click **Releases** > **Draft a new release**.
+    *   **Tag version**: `v0.0.2` (matching your `pyproject.toml`).
+    *   **Title**: `v0.0.2`.
+    *   Click **Publish release**.
+
+3.  **Verify**:
+    *   Check the **Actions** tab to see the `Publish to PyPI` workflow running.
+    *   Once green, verify the new version is available on [PyPI](https://pypi.org/project/canvas-tools/).
