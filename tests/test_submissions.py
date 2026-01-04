@@ -9,8 +9,18 @@ import unittest
 from unittest.mock import patch, MagicMock, mock_open
 from canvas_tools.submissions import download_assignment_submissions
 
+import shutil
+import os
+
 class TestSubmissions(unittest.TestCase):
     """Test cases for the download_assignment_submissions function."""
+
+    def tearDown(self):
+        """Clean up any directories created during tests."""
+        dirs_to_remove = ["Test_Assignment_No_Attachments", "test_submissions"]
+        for d in dirs_to_remove:
+            if os.path.exists(d):
+                shutil.rmtree(d)
 
     @patch('canvas_tools.submissions.get_client')
     @patch('canvas_tools.submissions.requests.get')
