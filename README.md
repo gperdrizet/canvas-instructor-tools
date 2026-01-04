@@ -1,5 +1,7 @@
 # Canvas Tools
+[![CI](https://github.com/gperdrizet/canvas-instructor-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/gperdrizet/canvas-instructor-tools/actions/workflows/ci.yml)
 
+[![Publish to PyPI](https://github.com/gperdrizet/canvas-instructor-tools/actions/workflows/publish.yml/badge.svg)](https://github.com/gperdrizet/canvas-instructor-tools/actions/workflows/publish.yml)
 A Python package for automating common instructor operations on the Canvas LMS.
 
 ## Features
