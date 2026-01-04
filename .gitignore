@@ -2,3 +2,7 @@ __pycache__
 .env
 .venv
 .vscode
+data/
+submissions/
+dist/
+*.egg-info/

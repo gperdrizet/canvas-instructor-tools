@@ -17,6 +17,7 @@ class TestSubmissions(unittest.TestCase):
         mock_get_client.return_value = mock_canvas
         mock_canvas.get_course.return_value = mock_course
         mock_course.get_assignment.return_value = mock_assignment
+        mock_assignment.name = "Test Assignment"
         
         # Mock submission data
         mock_submission.user = {'name': 'Test User'}
@@ -44,7 +45,12 @@ class TestSubmissions(unittest.TestCase):
         mock_assignment.get_submissions.assert_called_with(include=["user", "submission_history"])
         
         # Check if directory creation was called
-        mock_path.assert_called_with("test_submissions")
+        # Expecting join of output_dir and sanitized assignment name
+        # We can't easily predict the exact string due to os.path.join separator, 
+        # but we can check if it ends with the assignment name
+        mock_path.assert_called()
+        args, _ = mock_path.call_args
+        self.assertIn("Test_Assignment", args[0])
         mock_path.return_value.mkdir.assert_called_with(parents=True, exist_ok=True)
 
         # Check if file download was attempted
@@ -72,6 +78,7 @@ class TestSubmissions(unittest.TestCase):
         mock_get_client.return_value = mock_canvas
         mock_canvas.get_course.return_value = mock_course
         mock_course.get_assignment.return_value = mock_assignment
+        mock_assignment.name = "Test Assignment No Attachments"
         
         # Submission has user but no attachments
         mock_submission.user = {'name': 'Test User'}

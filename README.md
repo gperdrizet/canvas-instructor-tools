@@ -33,7 +33,7 @@ canvas-tools download 12345 67890
 ```
 
 Optional arguments:
-*   `--output` or `-o`: Specify the output directory (default: `submissions/`)
+*   `--output` or `-o`: Specify the output directory (default: current directory)
 
 ### Python API
 
