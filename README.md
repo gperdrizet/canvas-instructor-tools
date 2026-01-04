@@ -11,7 +11,7 @@ A Python package for automating common instructor operations on the Canvas LMS.
 ## Installation
 
 ```bash
-pip install canvas-tools
+pip install canvas-instructor-tools
 ```
 
 ## Configuration
