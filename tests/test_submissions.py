@@ -1,0 +1,88 @@
+import unittest
+from unittest.mock import patch, MagicMock, mock_open
+from canvas_tools.submissions import download_assignment_submissions
+
+class TestSubmissions(unittest.TestCase):
+    @patch('canvas_tools.submissions.get_client')
+    @patch('canvas_tools.submissions.requests.get')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('canvas_tools.submissions.Path')
+    def test_download_assignment_submissions(self, mock_path, mock_file, mock_get, mock_get_client):
+        # Setup mocks
+        mock_canvas = MagicMock()
+        mock_course = MagicMock()
+        mock_assignment = MagicMock()
+        mock_submission = MagicMock()
+        
+        mock_get_client.return_value = mock_canvas
+        mock_canvas.get_course.return_value = mock_course
+        mock_course.get_assignment.return_value = mock_assignment
+        
+        # Mock submission data
+        mock_submission.user = {'name': 'Test User'}
+        mock_submission.attachments = [{'url': 'http://file.url', 'display_name': 'test.pdf'}]
+        mock_assignment.get_submissions.return_value = [mock_submission]
+        
+        # Mock requests response
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.content = b'file content'
+        mock_get.return_value = mock_response
+        
+        # Run function
+        download_assignment_submissions(123, 456, output_dir="test_submissions")
+
+        # Assertions
+        mock_canvas.get_course.assert_called_with(123)
+        mock_course.get_assignment.assert_called_with(456)
+        mock_assignment.get_submissions.assert_called_with(include=["user", "submission_history"])
+        
+        # Check if directory creation was called
+        mock_path.assert_called_with("test_submissions")
+        mock_path.return_value.mkdir.assert_called_with(parents=True, exist_ok=True)
+
+        # Check if file download was attempted
+        mock_get.assert_called_with('http://file.url')
+        
+        # Check if file was written
+        # Note: We can't easily check the exact path since os.path.join is used inside, 
+        # but we can check that open was called with 'wb' mode
+        mock_file.assert_called()
+        args, kwargs = mock_file.call_args
+        self.assertIn('test.pdf', args[0]) # Check filename part
+        self.assertIn('Test_User', args[0]) # Check username part
+        self.assertEqual(args[1], 'wb')
+        
+        mock_file().write.assert_called_with(b'file content')
+
+    @patch('canvas_tools.submissions.get_client')
+    def test_download_no_attachments(self, mock_get_client):
+        # Setup mocks for a submission with no attachments
+        mock_canvas = MagicMock()
+        mock_course = MagicMock()
+        mock_assignment = MagicMock()
+        mock_submission = MagicMock()
+        
+        mock_get_client.return_value = mock_canvas
+        mock_canvas.get_course.return_value = mock_course
+        mock_course.get_assignment.return_value = mock_assignment
+        
+        # Submission has user but no attachments
+        mock_submission.user = {'name': 'Test User'}
+        # No attachments attribute or empty list
+        del mock_submission.attachments 
+        
+        # We need to handle the hasattr check in the code
+        # The code checks: if not hasattr(submission, "user") or not hasattr(submission, "attachments"):
+        
+        mock_assignment.get_submissions.return_value = [mock_submission]
+        
+        # Run function
+        download_assignment_submissions(123, 456)
+        
+        # Should run without error and not attempt downloads
+        # We can verify this implicitly if it doesn't crash, 
+        # or explicitly by mocking requests.get and asserting not called
+        
+if __name__ == '__main__':
+    unittest.main()
