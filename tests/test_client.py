@@ -1,9 +1,17 @@
+"""
+Unit tests for the client module.
+
+This module contains tests for the Canvas API client initialization,
+verifying proper handling of arguments and environment variables.
+"""
+
 import unittest
 from unittest.mock import patch
 import os
 from canvas_tools.client import get_client
 
 class TestClient(unittest.TestCase):
+    """Test cases for the get_client function."""
 
     def test_get_client_with_args(self):
         """Test initializing client with explicit arguments."""

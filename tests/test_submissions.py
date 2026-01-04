@@ -1,8 +1,16 @@
+"""
+Unit tests for the submissions module.
+
+This module contains tests for the submission downloading functionality,
+verifying API interaction, file handling, and error management.
+"""
+
 import unittest
 from unittest.mock import patch, MagicMock, mock_open
 from canvas_tools.submissions import download_assignment_submissions
 
 class TestSubmissions(unittest.TestCase):
+    """Test cases for the download_assignment_submissions function."""
 
     @patch('canvas_tools.submissions.get_client')
     @patch('canvas_tools.submissions.requests.get')

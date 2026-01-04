@@ -37,15 +37,15 @@ def main():
         except ValueError as e:
             print(f"Configuration Error: {e}", file=sys.stderr)
             sys.exit(1)
+
         except CanvasException as e:
             print(f"Canvas API Error: {e}", file=sys.stderr)
             sys.exit(1)
+
         except OSError as e:
             print(f"File System Error: {e}", file=sys.stderr)
             sys.exit(1)
-        except Exception as e:
-            print(f"Unexpected Error: {e}", file=sys.stderr)
-            sys.exit(1)
+
     else:
         parser.print_help()
 

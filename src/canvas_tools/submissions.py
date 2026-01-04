@@ -65,7 +65,7 @@ def download_assignment_submissions(course_id, assignment_id, output_dir="."):
             print(f"Downloading {new_filename}...")
 
             try:
-                response = requests.get(file_url)
+                response = requests.get(file_url, timeout=30)
 
                 if response.status_code == 200:
                     with open(file_path, "wb") as f:
@@ -75,7 +75,10 @@ def download_assignment_submissions(course_id, assignment_id, output_dir="."):
                 else:
                     print(f"Failed to download {original_filename}: Status {response.status_code}")
 
-            except Exception as e:
-                print(f"Error downloading {original_filename}: {e}")
+            except requests.RequestException as e:
+                print(f"Network error downloading {original_filename}: {e}")
+
+            except OSError as e:
+                print(f"File error saving {original_filename}: {e}")
 
     print(f"\nDownload complete! {count} files saved to {target_dir}/")
