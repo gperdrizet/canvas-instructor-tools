@@ -46,6 +46,7 @@ canvas-tools review Incremental_Capstone_6_Save_the_Princess
 
 Optional arguments:
 *   `--force-rebuild`: Force pull and rebuild of the Ollama container image before running reviews. Useful if you need to update the underlying execution environment.
+*   `--solution`: Path to an instructor solution file (notebook or script) to provide as reference context during review. The assignment description is automatically included if available.
 
 ### Python API
 
