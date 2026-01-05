@@ -6,10 +6,14 @@ providers, specifically Anthropic and Ollama. It handles client initialization a
 requests, abstracting away the specific API details of each provider.
 """
 
-#import os
-from typing import Optional #, List, Dict, Any
+# Standard library imports
+from typing import Optional
+
+# Third-party imports
 import anthropic
 import ollama
+
+# Local imports
 from .config import get_config
 
 class LLMClient:
