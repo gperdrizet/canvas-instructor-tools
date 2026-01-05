@@ -36,6 +36,14 @@ Your goal is to:
 Return ONLY the bash script content. Do not use markdown code blocks. Start with #!/bin/bash.
 If you cannot determine how to run it, print an error message in the script and exit with status 1.
 """
+        
+        # Log the prompt and file list
+        log_path = Path("logs/execution_agent.log")
+        with open(log_path, "w") as log_file:
+            log_file.write(f"--- Processing Directory: {directory} ---\n")
+            log_file.write(f"Files found: {files}\n\n")
+            log_file.write("--- Prompt Sent to Model ---\n")
+            log_file.write(prompt + "\n\n")
 
         script_content = self.client.generate_text(
             prompt=prompt,
@@ -43,6 +51,11 @@ If you cannot determine how to run it, print an error message in the script and 
             provider=self.config.execution_provider,
             system_prompt="You are a helpful coding assistant that generates bash scripts."
         )
+        
+        # Log the response
+        with open(log_path, "a") as log_file:
+            log_file.write("--- Model Response (Generated Script) ---\n")
+            log_file.write(script_content + "\n")
         
         # Clean up markdown code blocks if the model ignores instructions
         script_content = script_content.replace("```bash", "").replace("```", "").strip()
