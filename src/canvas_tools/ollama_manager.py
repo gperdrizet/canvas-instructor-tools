@@ -58,8 +58,8 @@ class OllamaManager:
 
         # Check for existing container and remove it to ensure we use the latest config (GPU, etc.)
         try:
-            container = self.docker_client.containers.get(self.container_name)
             print("Removing existing Ollama container to ensure correct configuration...")
+            container = self.docker_client.containers.get(self.container_name)
             container.remove(force=True)
 
         except NotFound:
@@ -74,10 +74,10 @@ class OllamaManager:
         ollama_gpu_ids = str(self.config.ollama_gpu_ids)
 
         if ollama_gpu_ids.lower() == "all":
-             device_requests.append(DeviceRequest(count=-1, capabilities=[['gpu']]))
+            device_requests.append(DeviceRequest(count=-1, capabilities=[['gpu']]))
 
         else:
-             device_requests.append(DeviceRequest(device_ids=ollama_gpu_ids.split(","), capabilities=[['gpu']]))
+            device_requests.append(DeviceRequest(device_ids=ollama_gpu_ids.split(","), capabilities=[['gpu']]))
 
         self.docker_client.containers.run(
             self.config.ollama_docker_image,
