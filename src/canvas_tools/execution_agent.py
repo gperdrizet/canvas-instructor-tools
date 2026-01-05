@@ -38,7 +38,7 @@ If you cannot determine how to run it, print an error message in the script and 
 """
         
         # Log the prompt and file list
-        log_path = Path("logs/execution_agent.log")
+        log_path = directory / "execution_agent.log"
         with open(log_path, "w") as log_file:
             log_file.write(f"--- Processing Directory: {directory} ---\n")
             log_file.write(f"Files found: {files}\n\n")
