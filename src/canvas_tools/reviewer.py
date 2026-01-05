@@ -47,13 +47,10 @@ STDERR:
 Format the output as Markdown.
 """
         
-        # Determine provider based on config. If reviewer_model is claude, use anthropic.
-        provider = "anthropic" if "claude" in self.config.reviewer_model.lower() else "ollama"
-        
         review = self.client.generate_text(
             prompt=prompt,
             model=self.config.reviewer_model,
-            provider=provider,
+            provider=self.config.reviewer_provider,
             system_prompt="You are a helpful and strict teaching assistant."
         )
         
@@ -82,12 +79,10 @@ Please generate a "Meta-Review" for the whole class that:
 Format as Markdown.
 """
         
-        provider = "anthropic" if "claude" in self.config.reviewer_model.lower() else "ollama"
-
         metareview = self.client.generate_text(
             prompt=prompt,
             model=self.config.reviewer_model,
-            provider=provider,
+            provider=self.config.reviewer_provider,
             system_prompt="You are an educational data analyst."
         )
         

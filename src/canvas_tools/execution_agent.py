@@ -40,7 +40,7 @@ If you cannot determine how to run it, print an error message in the script and 
         script_content = self.client.generate_text(
             prompt=prompt,
             model=self.config.execution_model,
-            provider="ollama", # Using Ollama for the execution agent as requested (Qwen)
+            provider=self.config.execution_provider,
             system_prompt="You are a helpful coding assistant that generates bash scripts."
         )
         

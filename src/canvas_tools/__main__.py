@@ -14,6 +14,8 @@ from .organizer import SubmissionOrganizer
 from .execution_agent import ExecutionAgent
 from .docker_runner import DockerRunner
 from .reviewer import Reviewer
+from .config import get_config
+from .ollama_manager import OllamaManager
 
 def main():
     """
@@ -33,7 +35,7 @@ def main():
     dl_parser = subparsers.add_parser("download", help="Download assignment submissions")
     dl_parser.add_argument("course_id", type=int, help="Canvas Course ID")
     dl_parser.add_argument("assignment_id", type=int, help="Canvas Assignment ID")
-    dl_parser.add_argument("--output", "-o", default=".", help="Base output directory (default: current directory)")
+    dl_parser.add_argument("--output", "-o", default=".", help="Output directory (default: current directory)")
 
     # Review Submissions Command
     rv_parser = subparsers.add_parser("review", help="Run and review submissions")
@@ -63,6 +65,19 @@ def main():
             if not base_dir.exists():
                 print(f"Error: Directory {base_dir} does not exist.", file=sys.stderr)
                 sys.exit(1)
+
+            # Initialize Ollama if needed
+            config = get_config()
+            if config.execution_provider == "ollama" or config.reviewer_provider == "ollama":
+                print("Initializing Ollama...")
+                ollama_mgr = OllamaManager()
+                ollama_mgr.ensure_ollama_running()
+                
+                if config.execution_provider == "ollama":
+                    ollama_mgr.ensure_model_pulled(config.execution_model)
+                
+                if config.reviewer_provider == "ollama":
+                    ollama_mgr.ensure_model_pulled(config.reviewer_model)
 
             print("Organizing submissions...")
             organizer = SubmissionOrganizer(base_dir)
