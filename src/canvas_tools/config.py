@@ -24,7 +24,7 @@ class Config(BaseModel):
     execution_model: str = Field(default_factory=lambda: os.getenv("EXECUTION_MODEL", "qwen2.5-coder:32b")) # Defaulting to a reasonable ollama model name
     execution_provider: str = Field(default_factory=lambda: os.getenv("EXECUTION_PROVIDER", "ollama"))
     
-    reviewer_model: str = Field(default_factory=lambda: os.getenv("REVIEWER_MODEL", "claude-3-opus-20240229"))
+    reviewer_model: str = Field(default_factory=lambda: os.getenv("REVIEWER_MODEL", "claude-3-5-sonnet-20240620"))
     reviewer_provider: str = Field(default_factory=lambda: os.getenv("REVIEWER_PROVIDER", "anthropic"))
     
     class Config:

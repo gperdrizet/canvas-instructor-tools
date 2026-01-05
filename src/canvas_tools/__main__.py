@@ -41,6 +41,7 @@ def main():
     rv_parser = subparsers.add_parser("review", help="Run and review submissions")
     rv_parser.add_argument("directory", help="Directory containing downloaded submissions")
     rv_parser.add_argument("--force-rebuild", action="store_true", help="Force pull and rebuild of Ollama container image")
+    rv_parser.add_argument("--solution", help="Path to instructor solution file (optional)")
 
     args = parser.parse_args()
 
@@ -94,24 +95,31 @@ def main():
             for student_dir in student_dirs:
                 print(f"Processing {student_dir.name}...")
                 
-                # 1. Generate Execution Script
-                print("  Generating execution script...")
-                script = agent.generate_execution_script(student_dir)
-                script_path = student_dir / "run_submission.sh"
-                script_path.write_text(script)
-                
-                # 2. Run in Docker
-                print("  Running code...")
-                stdout, stderr = runner.run_script(student_dir)
-                
-                # 3. Review
-                print("  Generating review...")
-                review = reviewer.review_submission(student_dir, stdout, stderr)
-                
-                review_path = student_dir / "review.md"
-                review_path.write_text(review)
-                all_reviews.append(review)
-                print("  Done.")
+                try:
+                    # 1. Generate Execution Script
+                    print("  Generating execution script...")
+                    script = agent.generate_execution_script(student_dir)
+                    script_path = student_dir / "run_submission.sh"
+                    script_path.write_text(script)
+                    
+                    # 2. Run in Docker
+                    print("  Running code...")
+                    stdout, stderr = runner.run_script(student_dir)
+                    
+                    # 3. Review
+                    print("  Generating review...")
+                    review = reviewer.review_submission(student_dir, stdout, stderr, solution_path=args.solution)
+                    
+                    review_path = student_dir / "review.md"
+                    review_path.write_text(review)
+                    all_reviews.append(review)
+                    print("  Done.")
+                    
+                except Exception as e:
+                    print(f"  Error processing {student_dir.name}: {e}")
+                    error_review = f"# Review Error\n\nAn error occurred during processing:\n\n```\n{str(e)}\n```"
+                    (student_dir / "review.md").write_text(error_review)
+                    continue
 
             # 4. Meta-Review
             if all_reviews:

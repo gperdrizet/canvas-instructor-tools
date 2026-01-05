@@ -9,10 +9,15 @@ class DockerRunner:
         self.config = get_config()
         self.client = docker.from_env()
 
-    def run_script(self, host_dir: Path, script_name: str = "run_submission.sh", timeout: int = 300) -> Tuple[str, str]:
+    def run_script(self, host_dir: Path, script_name: str = "run_submission.sh", timeout: int = 600) -> Tuple[str, str]:
         """
         Runs a shell script inside a docker container with the host_dir mounted.
         Returns (stdout, stderr).
+        
+        Args:
+            host_dir: Directory containing the student submission
+            script_name: Name of the script to execute
+            timeout: Maximum execution time in seconds (default: 600)
         """
         abs_host_dir = host_dir.resolve()
         

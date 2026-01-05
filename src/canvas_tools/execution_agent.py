@@ -1,11 +1,13 @@
-import os
+#import os
 from pathlib import Path
-from typing import List
+#from typing import List
 from .llm_client import LLMClient
 from .config import get_config
 
 class ExecutionAgent:
+
     def __init__(self):
+
         self.client = LLMClient()
         self.config = get_config()
 
@@ -13,12 +15,13 @@ class ExecutionAgent:
         """
         Analyzes files in the directory and generates a bash script to run the submission.
         """
+    
         files = [f.name for f in directory.iterdir() if f.is_file()]
         file_list_str = "\n".join(files)
-        
+
         # We can optionally read the contents of requirements.txt or main files if needed,
         # but for now let's just give the file list to the model.
-        
+
         prompt = f"""
 You are an expert DevOps and Python engineer. You need to create a bash script to execute a student's submission.
 The submission is located in the current directory.
@@ -36,10 +39,12 @@ Your goal is to:
 Return ONLY the bash script content. Do not use markdown code blocks. Start with #!/bin/bash.
 If you cannot determine how to run it, print an error message in the script and exit with status 1.
 """
-        
+
         # Log the prompt and file list
         log_path = directory / "execution_agent.log"
+
         with open(log_path, "w") as log_file:
+
             log_file.write(f"--- Processing Directory: {directory} ---\n")
             log_file.write(f"Files found: {files}\n\n")
             log_file.write("--- Prompt Sent to Model ---\n")
@@ -51,13 +56,14 @@ If you cannot determine how to run it, print an error message in the script and 
             provider=self.config.execution_provider,
             system_prompt="You are a helpful coding assistant that generates bash scripts."
         )
-        
+
         # Log the response
         with open(log_path, "a") as log_file:
+
             log_file.write("--- Model Response (Generated Script) ---\n")
             log_file.write(script_content + "\n")
-        
+
         # Clean up markdown code blocks if the model ignores instructions
         script_content = script_content.replace("```bash", "").replace("```", "").strip()
-        
+
         return script_content

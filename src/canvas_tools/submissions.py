@@ -39,6 +39,16 @@ def download_assignment_submissions(course_id, assignment_id, output_dir="."):
     # Create output directory
     Path(target_dir).mkdir(parents=True, exist_ok=True)
 
+    # Save assignment description
+    if hasattr(assignment, "description") and assignment.description:
+        desc_path = os.path.join(target_dir, "assignment_description.md")
+        try:
+            with open(desc_path, "w", encoding="utf-8") as f:
+                f.write(assignment.description)
+            print(f"Saved assignment description to {desc_path}")
+        except OSError as e:
+            print(f"Warning: Could not save assignment description: {e}")
+
     # Get submissions with user data to name files nicely
     submissions = assignment.get_submissions(include=["user", "submission_history"])
 
