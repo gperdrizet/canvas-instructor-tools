@@ -1,3 +1,12 @@
+"""
+Ollama Manager Module.
+
+This module provides functionality to manage the Ollama container and models
+for local LLM execution. It handles the lifecycle of the Ollama Docker container,
+ensuring it is running with the correct configuration (including GPU support),
+and manages the pulling of required models.
+"""
+
 import time
 import docker
 import ollama
@@ -7,8 +16,20 @@ from docker.types import DeviceRequest
 from .config import get_config
 
 class OllamaManager:
+    """
+    Manages the Ollama Docker container and model interactions.
+
+    This class provides methods to start/stop the Ollama container, ensure it is
+    running with the correct settings, and pull necessary models for execution
+    and review tasks.
+    """
 
     def __init__(self):
+        """
+        Initialize the OllamaManager.
+
+        Sets up the configuration, Docker client, and Ollama client.
+        """
         self.config = get_config()
         self.docker_client = docker.from_env()
         self.container_name = "canvas_tools_ollama"
@@ -25,6 +46,7 @@ class OllamaManager:
 
         # Only manage if we are pointing to localhost
         base_url = str(self.config.ollama_base_url)
+
         if "localhost" not in base_url and "127.0.0.1" not in base_url:
             print(f"Ollama URL is {self.config.ollama_base_url}, assuming external management.")
             return
@@ -67,7 +89,17 @@ class OllamaManager:
         self._wait_for_server()
 
     def _wait_for_server(self, timeout=60):
-        """Wait for Ollama API to be responsive."""
+        """
+        Wait for the Ollama API to be responsive.
+
+        Polls the Ollama server's list endpoint to check if it is ready to accept requests.
+
+        Args:
+            timeout (int): Maximum time to wait in seconds. Defaults to 60.
+
+        Raises:
+            TimeoutError: If the server does not become ready within the timeout period.
+        """
 
         print("Waiting for Ollama server to be ready...")
 
@@ -88,7 +120,10 @@ class OllamaManager:
 
     def ensure_model_pulled(self, model_name: str):
         """
-        Checks if the model exists, pulls it if not.
+        Checks if the specified model exists in the Ollama instance, and pulls it if not.
+
+        Args:
+            model_name (str): The name of the model to check/pull (e.g., "llama3", "qwen2.5-coder").
         """
 
         # Clean model name (remove tag if needed for check, but list() returns names with tags)
