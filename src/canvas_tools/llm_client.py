@@ -16,7 +16,7 @@ class LLMClient:
         # The ollama library uses OLLAMA_HOST env var, but we can also pass it if needed.
         # For now, we assume the env var or default is sufficient for the library, 
         # or we set it explicitly if the library supports client instantiation.
-        self.ollama_client = ollama.Client(host=self.config.ollama_base_url)
+        self.ollama_client = ollama.Client(base_url=self.config.ollama_base_url)
 
     def generate_text(self, prompt: str, model: str, system_prompt: Optional[str] = None, provider: str = "ollama") -> str:
         """

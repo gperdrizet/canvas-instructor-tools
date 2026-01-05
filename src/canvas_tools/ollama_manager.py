@@ -9,7 +9,7 @@ class OllamaManager:
         self.config = get_config()
         self.docker_client = docker.from_env()
         self.container_name = "canvas_tools_ollama"
-        self.client = ollama.Client(host=self.config.ollama_base_url)
+        self.client = ollama.Client(base_url=self.config.ollama_base_url)
 
     def ensure_ollama_running(self):
         """

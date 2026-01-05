@@ -1,6 +1,9 @@
 import os
 from typing import Optional
 from pydantic import BaseModel, Field
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Config(BaseModel):
     # Canvas
