@@ -37,6 +37,16 @@ canvas-tools download 12345 67890
 Optional arguments:
 *   `--output` or `-o`: Specify the output directory (default: current directory)
 
+To review downloaded submissions:
+
+```bash
+# Syntax: canvas-tools review <directory>
+canvas-tools review Incremental_Capstone_6_Save_the_Princess
+```
+
+Optional arguments:
+*   `--force-rebuild`: Force pull and rebuild of the Ollama container image before running reviews. Useful if you need to update the underlying execution environment.
+
 ### Python API
 
 ```python
