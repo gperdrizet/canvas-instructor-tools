@@ -7,8 +7,13 @@ and dispatching commands to the appropriate functions.
 
 import argparse
 import sys
+from pathlib import Path
 from canvasapi.exceptions import CanvasException
 from .submissions import download_assignment_submissions
+from .organizer import SubmissionOrganizer
+from .execution_agent import ExecutionAgent
+from .docker_runner import DockerRunner
+from .reviewer import Reviewer
 
 def main():
     """
@@ -17,6 +22,7 @@ def main():
     Parses command-line arguments and executes the requested command.
     Currently supported commands:
         - download: Download assignment submissions.
+        - review: Run and review downloaded submissions.
     """
 
     # Instantiate the argument parser
@@ -28,6 +34,11 @@ def main():
     dl_parser.add_argument("course_id", type=int, help="Canvas Course ID")
     dl_parser.add_argument("assignment_id", type=int, help="Canvas Assignment ID")
     dl_parser.add_argument("--output", "-o", default=".", help="Base output directory (default: current directory)")
+
+    # Review Submissions Command
+    rv_parser = subparsers.add_parser("review", help="Run and review submissions")
+    rv_parser.add_argument("directory", help="Directory containing downloaded submissions")
+
     args = parser.parse_args()
 
     if args.command == "download":
@@ -44,6 +55,59 @@ def main():
 
         except OSError as e:
             print(f"File System Error: {e}", file=sys.stderr)
+            sys.exit(1)
+
+    elif args.command == "review":
+        try:
+            base_dir = Path(args.directory)
+            if not base_dir.exists():
+                print(f"Error: Directory {base_dir} does not exist.", file=sys.stderr)
+                sys.exit(1)
+
+            print("Organizing submissions...")
+            organizer = SubmissionOrganizer(base_dir)
+            student_dirs = organizer.organize()
+            print(f"Found {len(student_dirs)} student submissions.")
+
+            agent = ExecutionAgent()
+            runner = DockerRunner()
+            reviewer = Reviewer()
+            
+            all_reviews = []
+
+            for student_dir in student_dirs:
+                print(f"Processing {student_dir.name}...")
+                
+                # 1. Generate Execution Script
+                print("  Generating execution script...")
+                script = agent.generate_execution_script(student_dir)
+                script_path = student_dir / "run_submission.sh"
+                script_path.write_text(script)
+                
+                # 2. Run in Docker
+                print("  Running code...")
+                stdout, stderr = runner.run_script(student_dir)
+                
+                # 3. Review
+                print("  Generating review...")
+                review = reviewer.review_submission(student_dir, stdout, stderr)
+                
+                review_path = student_dir / "review.md"
+                review_path.write_text(review)
+                all_reviews.append(review)
+                print("  Done.")
+
+            # 4. Meta-Review
+            if all_reviews:
+                print("Generating class meta-review...")
+                metareview = reviewer.generate_metareview(all_reviews)
+                (base_dir / "class_summary.md").write_text(metareview)
+                print("Meta-review saved to class_summary.md")
+
+        except Exception as e:
+            print(f"An error occurred during review: {e}", file=sys.stderr)
+            import traceback
+            traceback.print_exc()
             sys.exit(1)
 
     else:

@@ -1,0 +1,57 @@
+import os
+import shutil
+import re
+from pathlib import Path
+from typing import List
+
+class SubmissionOrganizer:
+    def __init__(self, base_dir: str):
+        self.base_dir = Path(base_dir)
+
+    def organize(self) -> List[Path]:
+        """
+        Scans the base directory for submission files, creates student directories,
+        and moves files into them. Returns a list of student directories.
+        """
+        if not self.base_dir.exists():
+            raise FileNotFoundError(f"Directory {self.base_dir} does not exist.")
+
+        student_dirs = set()
+        
+        # Canvas file format: "Student Name_ID_Question_ID_Original_Filename"
+        # Or sometimes just "Student Name_ID_Original_Filename"
+        # We'll try to extract the student name.
+        # Based on previous context, it seems files are named [Student_Name]_[Original_Filename]
+        
+        # We need to be careful not to process directories we just created.
+        files = [f for f in self.base_dir.iterdir() if f.is_file()]
+
+        for file_path in files:
+            filename = file_path.name
+            # Simple heuristic: split by first underscore to get student name
+            # This assumes the format is consistent with what was described earlier.
+            if '_' in filename:
+                student_name = filename.split('_')[0]
+                
+                # Create directory
+                student_dir = self.base_dir / student_name
+                student_dir.mkdir(exist_ok=True)
+                
+                # Move file
+                new_path = student_dir / filename
+                shutil.move(str(file_path), str(new_path))
+                
+                student_dirs.add(student_dir)
+            else:
+                # If no underscore, maybe it's a meta file or weirdly named.
+                # We might skip or move to a 'misc' folder. For now, skip.
+                pass
+        
+        # Also include directories that might have already existed (idempotency)
+        for item in self.base_dir.iterdir():
+            if item.is_dir() and item not in student_dirs:
+                # Check if it looks like a student dir (not hidden)
+                if not item.name.startswith('.'):
+                    student_dirs.add(item)
+
+        return list(student_dirs)
