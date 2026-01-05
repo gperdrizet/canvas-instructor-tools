@@ -7,6 +7,7 @@ and dispatching commands to the appropriate functions.
 
 import argparse
 import sys
+import shutil
 from pathlib import Path
 from canvasapi.exceptions import CanvasException
 from .submissions import download_assignment_submissions
@@ -96,6 +97,16 @@ def main():
                 print(f"Processing {student_dir.name}...")
                 
                 try:
+                    # 0. Copy shared data files from parent directory
+                    data_extensions = {".csv", ".json", ".txt", ".xlsx", ".tsv", ".xml"}
+                    parent_dir = student_dir.parent
+                    for data_file in parent_dir.iterdir():
+                        if data_file.is_file() and data_file.suffix.lower() in data_extensions:
+                            dest = student_dir / data_file.name
+                            if not dest.exists():
+                                shutil.copy2(data_file, dest)
+                                print(f"  Copied data file: {data_file.name}")
+                    
                     # 1. Generate Execution Script
                     print("  Generating execution script...")
                     script = agent.generate_execution_script(student_dir)
