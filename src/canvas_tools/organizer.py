@@ -31,7 +31,12 @@ class SubmissionOrganizer:
             # Simple heuristic: split by first underscore to get student name
             # This assumes the format is consistent with what was described earlier.
             if '_' in filename:
-                student_name = filename.split('_')[0]
+                # Try to get First_Last (2 tokens) to avoid collisions with common first names
+                parts = filename.split('_')
+                if len(parts) >= 2:
+                    student_name = "_".join(parts[:2])
+                else:
+                    student_name = parts[0]
                 
                 # Create directory
                 student_dir = self.base_dir / student_name
