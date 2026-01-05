@@ -1,4 +1,4 @@
-#import os
+import json
 from pathlib import Path
 from typing import List #, Dict
 from .llm_client import LLMClient
@@ -9,6 +9,31 @@ class Reviewer:
     def __init__(self):
         self.client = LLMClient()
         self.config = get_config()
+
+    def _parse_notebook(self, file_path: Path) -> str:
+        """
+        Parses a Jupyter Notebook file and extracts code and markdown cells,
+        ignoring outputs to save space.
+        """
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                notebook = json.load(f)
+            
+            content = []
+            for cell in notebook.get('cells', []):
+                cell_type = cell.get('cell_type', '')
+                source = cell.get('source', [])
+                if isinstance(source, list):
+                    source = "".join(source)
+                
+                if cell_type == 'code':
+                    content.append(f"```python\n{source}\n```")
+                elif cell_type == 'markdown':
+                    content.append(f"{source}")
+            
+            return "\n\n".join(content)
+        except Exception as e:
+            return f"Error parsing notebook: {e}"
 
     def review_submission(self, directory: Path, stdout: str, stderr: str) -> str:
         """
@@ -78,13 +103,16 @@ Return ONLY a list of filenames to review, one per line. Do not include any othe
 
         for f in selected_files:
 
-            # Skip very large files (likely data or binaries)
-            if f.stat().st_size > 100000:
+            # Skip very large files (likely data or binaries), but allow notebooks to be parsed
+            if f.stat().st_size > 100000 and not f.name.endswith(".ipynb"):
                 code_content += f"\n--- File: {f.name} (Skipped - Too Large > 100KB) ---\n"
                 continue
 
             try:
-                content = f.read_text(errors='replace')
+                if f.name.endswith(".ipynb"):
+                    content = self._parse_notebook(f)
+                else:
+                    content = f.read_text(errors='replace')
 
                 if total_code_len + len(content) > max_total_code_len:
                     code_content += f"\n--- File: {f.name} (Skipped - Total Limit Reached) ---\n"
