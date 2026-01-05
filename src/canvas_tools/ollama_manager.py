@@ -44,13 +44,6 @@ class OllamaManager:
             force_pull: If True, pulls the latest Ollama Docker image before starting.
         """
 
-        # Only manage if we are pointing to localhost
-        base_url = str(self.config.ollama_base_url)
-
-        if "localhost" not in base_url and "127.0.0.1" not in base_url:
-            print(f"Ollama URL is {self.config.ollama_base_url}, assuming external management.")
-            return
-
         # Pull the image if requested
         if force_pull:
 
