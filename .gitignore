@@ -5,5 +5,4 @@ __pycache__
 data/
 submissions/
 dist/
-logs/
 *.egg-info/
