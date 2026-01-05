@@ -20,6 +20,12 @@ class Reviewer:
         all_files = [f for f in directory.iterdir() if f.is_file() and f.name != "run_submission.sh" and not f.name.endswith(".md")]
         file_list_str = "\n".join([f.name for f in all_files])
 
+        # Initialize log
+        log_path = directory / "reviewer_agent.log"
+        with open(log_path, "w") as log_file:
+            log_file.write(f"--- Reviewing Submission in: {directory} ---\n")
+            log_file.write(f"Files found: {[f.name for f in all_files]}\n\n")
+
         # Step 1: Generate Review Plan
         plan_prompt = f"""
 You are an expert Computer Science instructor. You need to review a student's submission.
@@ -31,6 +37,10 @@ Ignore data files (csv, json, txt), images, compiled binaries, or system files u
 
 Return ONLY a list of filenames to review, one per line. Do not include any other text.
 """
+        with open(log_path, "a") as log_file:
+            log_file.write("--- Step 1: Review Plan Prompt ---\n")
+            log_file.write(plan_prompt + "\n\n")
+
         try:
             plan_response = self.client.generate_text(
                 prompt=plan_prompt,
@@ -38,6 +48,11 @@ Return ONLY a list of filenames to review, one per line. Do not include any othe
                 provider=self.config.reviewer_provider,
                 system_prompt="You are a helpful teaching assistant."
             )
+            
+            with open(log_path, "a") as log_file:
+                log_file.write("--- Step 1: Review Plan Response ---\n")
+                log_file.write(plan_response + "\n\n")
+
             # Parse the plan
             files_to_review = [line.strip() for line in plan_response.splitlines() if line.strip()]
 
@@ -95,6 +110,10 @@ You are an expert Computer Science instructor. Please analyze the following stud
 
 Do not provide a grade yet. Focus on the code itself.
 """
+        with open(log_path, "a") as log_file:
+            log_file.write("--- Step 2: Code Analysis Prompt ---\n")
+            log_file.write(code_prompt + "\n\n")
+
         try:
             code_analysis = self.client.generate_text(
                 prompt=code_prompt,
@@ -102,8 +121,15 @@ Do not provide a grade yet. Focus on the code itself.
                 provider=self.config.reviewer_provider,
                 system_prompt="You are a helpful and strict teaching assistant."
             )
+            
+            with open(log_path, "a") as log_file:
+                log_file.write("--- Step 2: Code Analysis Response ---\n")
+                log_file.write(code_analysis + "\n\n")
+
         except Exception as e:
             code_analysis = f"Error analyzing code: {e}"
+            with open(log_path, "a") as log_file:
+                log_file.write(f"--- Step 2: Code Analysis Error ---\n{e}\n\n")
 
         # Step 2: Final Review with Execution Output
         # Truncate output if necessary, but be generous.
@@ -137,10 +163,20 @@ STDERR:
 Format the output as Markdown.
 """
 
+        with open(log_path, "a") as log_file:
+            log_file.write("--- Step 3: Final Review Prompt ---\n")
+            log_file.write(final_prompt + "\n\n")
+
         review = self.client.generate_text(
             prompt=final_prompt,
+            model=self.config.reviewer_model,
+            provider=self.config.reviewer_provider,
             system_prompt="You are a helpful and strict teaching assistant."
         )
+
+        with open(log_path, "a") as log_file:
+            log_file.write("--- Step 3: Final Review Response ---\n")
+            log_file.write(review + "\n\n")
 
         return review
 
