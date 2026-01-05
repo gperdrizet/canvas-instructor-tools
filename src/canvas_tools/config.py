@@ -13,6 +13,7 @@ class Config(BaseModel):
     # Docker
     docker_image: str = Field(default_factory=lambda: os.getenv("DOCKER_IMAGE", "jupyter/scipy-notebook:latest"))
     ollama_docker_image: str = Field(default_factory=lambda: os.getenv("OLLAMA_DOCKER_IMAGE", "ollama/ollama:latest"))
+    ollama_gpu_ids: str = Field(default_factory=lambda: os.getenv("OLLAMA_GPU_IDS", "all"))
     
     # LLM Providers
     ollama_base_url: str = Field(default_factory=lambda: os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"))

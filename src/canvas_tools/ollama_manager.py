@@ -76,6 +76,16 @@ class OllamaManager:
 
         # We need to bind the port. Assuming 11434 based on default.
         # Also mounting a volume for models is good practice so we don't re-download every time.
+        device_requests = []
+
+        ollama_gpu_ids = str(self.config.ollama_gpu_ids)
+
+        if ollama_gpu_ids.lower() == "all":
+             device_requests.append(DeviceRequest(count=-1, capabilities=[['gpu']]))
+
+        else:
+             device_requests.append(DeviceRequest(device_ids=ollama_gpu_ids.split(","), capabilities=[['gpu']]))
+
         self.docker_client.containers.run(
             self.config.ollama_docker_image,
             name=self.container_name,
@@ -83,7 +93,7 @@ class OllamaManager:
             volumes={'canvas_tools_ollama_data': {'bind': '/root/.ollama', 'mode': 'rw'}},
             detach=True,
             auto_remove=False,
-            device_requests=[DeviceRequest(device_ids=["1"], capabilities=[['gpu']])]
+            device_requests=device_requests
         )
 
         self._wait_for_server()

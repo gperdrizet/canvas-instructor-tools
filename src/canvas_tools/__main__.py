@@ -40,6 +40,7 @@ def main():
     # Review Submissions Command
     rv_parser = subparsers.add_parser("review", help="Run and review submissions")
     rv_parser.add_argument("directory", help="Directory containing downloaded submissions")
+    rv_parser.add_argument("--force-rebuild", action="store_true", help="Force pull and rebuild of Ollama container image")
 
     args = parser.parse_args()
 
@@ -71,7 +72,7 @@ def main():
             if config.execution_provider == "ollama" or config.reviewer_provider == "ollama":
                 print("Initializing Ollama...")
                 ollama_mgr = OllamaManager()
-                ollama_mgr.ensure_ollama_running()
+                ollama_mgr.ensure_ollama_running(force_pull=args.force_rebuild)
                 
                 if config.execution_provider == "ollama":
                     ollama_mgr.ensure_model_pulled(config.execution_model)
