@@ -135,11 +135,6 @@ Return ONLY a list of filenames to review, one per line. Do not include any othe
 
         for f in selected_files:
 
-            # Skip very large files (likely data or binaries), but allow notebooks to be parsed
-            if f.stat().st_size > 100000 and not f.name.endswith(".ipynb"):
-                code_content += f"\n--- File: {f.name} (Skipped - Too Large > 100KB) ---\n"
-                continue
-
             try:
                 if f.name.endswith(".ipynb"):
                     content = self._parse_notebook(f)

@@ -25,15 +25,16 @@ class SubmissionOrganizer:
         # We need to be careful not to process directories we just created.
         files = [f for f in self.base_dir.iterdir() if f.is_file()]
 
-        # System files to ignore
+        # System files and data files to ignore
         ignore_files = {"assignment_description.md", "class_summary.md"}
+        data_extensions = {".csv", ".json", ".txt", ".xlsx", ".tsv", ".xml", ".ipynb"}
 
         for file_path in files:
 
             filename = file_path.name
 
-            # Skip system files
-            if filename in ignore_files:
+            # Skip system files and data files (these should stay in the parent directory)
+            if filename in ignore_files or file_path.suffix.lower() in data_extensions:
                 continue
 
             # Simple heuristic: split by first underscore to get student name
