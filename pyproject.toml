@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "canvas-instructor-tools"
-version = "0.1.0-alpha"
+version = "0.1.0-alpha.1"
 authors = [
   { name="George Perdrizet", email="george@perdrizet.org" },
 ]
@@ -22,6 +22,7 @@ classifiers = [
 dependencies = [
     "canvasapi>=3.0.0",
     "python-dotenv>=1.0.0",
+  "requests>=2.31.0",
 ]
 
 [project.scripts]
