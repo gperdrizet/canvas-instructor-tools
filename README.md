@@ -1,13 +1,16 @@
-# Canvas Tools
+# Canvas Instructor Tools
 
-A Python package for automating common instructor operations on the Canvas LMS.
+A Python package for automating common instructor operations on the Canvas LMS. Provides both a command-line interface and Python API for course management, submission downloads, and grade posting.
 
 ## Features
 
-*   **Download Submissions**: Bulk download all file submissions for a specific assignment, automatically renaming them with the student's name.
-*   **Course and Assignment Discovery**: List available courses and assignments.
-*   **Submission Metadata**: Retrieve normalized submission payloads and assignment descriptions.
-*   **Grade and Comment Posting**: Post grades/comments for individual students or batch updates.
+*   **Download Submissions**: Bulk download all file submissions for a specific assignment, automatically renaming them with the student's name
+*   **URL Submission Handling**: Optionally download content from URL submissions
+*   **Course and Assignment Discovery**: List available courses and assignments with metadata
+*   **Submission Metadata**: Retrieve normalized submission payloads and assignment descriptions
+*   **Grade and Comment Posting**: Post grades/comments for individual students or batch updates
+*   **HTTP Safety**: Built-in retry logic and error handling for Canvas API interactions
+*   **CLI and Python API**: Use from command line or integrate into Python applications
 
 ## Installation
 
@@ -91,16 +94,16 @@ This project uses GitHub Actions for automated testing and publishing.
 ### How to Publish a New Version
 
 1.  **Update Version**:
-    *   Edit `pyproject.toml` and increment the `version` (e.g., `0.0.1` -> `0.0.2`).
-    *   Commit and push to `main`.
+    *   Edit `pyproject.toml` and increment the `version` (e.g., `0.1.0-alpha.1` -> `0.1.0-alpha.2`)
+    *   Commit and push to `main`
 
-2.  **Create Release**:
-    *   Go to the GitHub repository page.
-    *   Click **Releases** > **Draft a new release**.
-    *   **Tag version**: `v0.0.2` (matching your `pyproject.toml`).
-    *   **Title**: `v0.0.2`.
-    *   Click **Publish release**.
+2.  **Create and Push Tag**:
+    *   Create an annotated tag: `git tag -a v0.1.0-alpha.2 -m "Version 0.1.0-alpha.2"`
+    *   Push the tag: `git push --tags`
+    *   The publish workflow triggers automatically on `v*` tags
 
 3.  **Verify**:
-    *   Check the **Actions** tab to see the `Publish to PyPI` workflow running.
-    *   Once green, verify the new version is available on [PyPI](https://pypi.org/project/canvas-instructor-tools/).
+    *   Check the **Actions** tab to see the `Publish to PyPI` workflow running
+    *   Once green, verify the new version is available on [PyPI](https://pypi.org/project/canvas-instructor-tools/)
+
+**Alternative**: Create a GitHub Release through the web UI (tag format: `v0.1.0-alpha.2`) to trigger publication.
